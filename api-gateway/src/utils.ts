@@ -2,44 +2,55 @@
 import  {Express, Request, Response } from "express";
 import config from './config.json';
 import axios from "axios";
+ 
 
 
 
 export const createHandler = (hostname: string, path: string, method: string) => {
     return async (req: Request, res: Response) => {
-      try {
-          const { data } = await axios({
-            method,
-            url: `${hostname}${path}`,
-            data: req.body
-        })
-        res.json(data)
-      } catch (error) {
-        if(error instanceof axios.AxiosError) {
-            
-            res.status(error.response?.status || 500).json({ message: error.message });
+        
+        try {
+            let url= `${hostname}${path}`;
+            req.params && Object.keys(req.params).forEach(params=>{
+                url = url.replace(`:${params}`, req.params[params]);
+            })
+            const { data } = await axios({
+                method,
+                url: `${hostname}${path}`,
+                data: req.body
+            });
+            res.json(data);
+        } catch (error) {
+            if (error instanceof axios.AxiosError) {
+                console.log(`Axios error: ${error.response?.status} - ${error.message}`);
+                return res.status(error.response?.status || 500).json({ message: error.message });
+            }
+            console.log(error);
+            return res.status(500).json({ message: "Internal server error" });
         }
-        console.log(error);
-        res.status(500).json({ message: "Internal server error" });
-      }
-    }
-}
+    };
+};
+ 
 
-
-export const configureRoutes = (app:Express) => {
+export const configureRoutes = (app: Express) => {
+    console.log('Config:', JSON.stringify(config, null, 2));
     Object.entries(config.services).forEach(([_name, service]) => {
         const hostname = service.url;
         service.routes.forEach((route) => {
             route.methods.forEach((method) => {
                 const handler = createHandler(hostname, route.path, method);
-                const expressMethod = method.toLowerCase() as keyof Express;
-                (app[expressMethod] as any)(`/api${route.path}`, handler);
-               
+                const endpoint = `/api${route.path}`;
+                
+                app[method.toLowerCase() as keyof Express](endpoint, handler);
+                console.log(`Registered route: ${method.toUpperCase()} ${endpoint} -> ${hostname}${route.path}`);
             });
         })
-    })
-}
+    });
+};
 
+
+
+// ok 
 
 // import { Express, Request, Response } from "express";
 // import axios, { AxiosError } from "axios";

@@ -5,7 +5,7 @@
       "routes": [
         {
           "path": "/products",
-          "methods": ["get", "post"]
+          "methods": ["get"]
         },
         {
           "path": "/products/:id",
