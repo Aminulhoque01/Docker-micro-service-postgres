@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "rootDir": "c:/workspace/micro-service-postgresql/api-gateway", // Change this to the parent directory
+    "rootDir": "./src", // Set to the relative path of your source files
     "outDir": "./dist", 
     "module": "commonjs",
     "resolveJsonModule": true,
@@ -8,7 +8,7 @@
     "strict": true
   },
   "include": [
-    "c:/workspace/micro-service-postgresql/api-gateway/src/**/*",  // Include all files in src
-    "c:/workspace/micro-service-postgresql/api-gateway/getSingleProduct.ts" // Also include getSingleProduct.ts
+    "./src/**/*",  // Include all files in src
+    
   ]
 }
