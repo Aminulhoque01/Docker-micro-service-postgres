@@ -3,6 +3,8 @@ import * as dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import { Pool } from "pg"; // Using Pool for connection pooling
+import getUser from "./controllers/getUser";
+import createUser from "./controllers/createUser";
  
 
 dotenv.config();
@@ -17,6 +19,10 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ status: "UP" });
 });
 
+
+// routes 
+app.get("/users/:id", getUser);
+app.post("/users", createUser);
 
 // 404 Not Found handler
 app.use((_req, res) => {
