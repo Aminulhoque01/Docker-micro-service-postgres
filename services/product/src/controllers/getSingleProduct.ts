@@ -30,7 +30,7 @@ const getProductDetails = async (req: Request, res: Response, next: NextFunction
           sku: product.sku,
         }
       );
-
+      
       console.log(`Inventory created successfully`, inventory.id);
 
       // Update product with the new inventory id
