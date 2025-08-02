@@ -1,4 +1,2 @@
-export { default as userRegistration } from "./userRegistration";
-
-export { default as verifyToken } from "./verifyToken";
-export { default as userLogin } from "./userLogin";
+export {default as getEmails} from "./getEmails";
+export {default as sendMail} from "./sentEmail";
