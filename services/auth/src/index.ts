@@ -3,7 +3,7 @@ import * as dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import { Pool } from "pg"; // Using Pool for connection pooling
-import { userRegistration } from "./controllers";
+import { userLogin, userRegistration, verifyToken } from "./controllers";
  
  
 
@@ -22,7 +22,9 @@ app.get("/health", (_req, res) => {
 
 // routes 
  
-app.post("/registration-user", userRegistration);
+app.post("/auth/registration-user", userRegistration);
+app.post("/auth/verify-token", verifyToken);
+app.post("/auth/login-user", userLogin)
 
 // 404 Not Found handler
 app.use((_req, res) => {
