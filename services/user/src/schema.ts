@@ -13,4 +13,4 @@ export const  UserCreateSchema = z.object({
 
 export const UserUpdateSchema =  UserCreateSchema.omit({authUserId: true,}).partial();
 
-const data = UserUpdateSchema.parse({}); 
+ 
