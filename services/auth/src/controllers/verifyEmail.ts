@@ -25,12 +25,7 @@ const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
                 message: "User not found",
             });
         }
-        if (!user) {
-            return res.status(404).json({
-                message: "User not found",
-            });
-        }
-
+       
 
         // Check if the verification code 
         const verificationCode = await prisma.verificationCode.findFirst({
