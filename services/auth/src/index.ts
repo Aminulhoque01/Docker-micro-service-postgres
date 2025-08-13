@@ -3,7 +3,7 @@ import * as dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import { Pool } from "pg"; // Using Pool for connection pooling
-import { userLogin, userRegistration, verifyEmail, verifyToken } from "./controllers";
+import { userLogin, userRegistration,  verifyEmail,  verifyToken } from "./controllers";
  
  
 
@@ -23,10 +23,9 @@ app.get("/health", (_req, res) => {
 // routes 
  
 app.post("/auth/registration-user", userRegistration);
+app.post("/auth/verifyEmail", verifyEmail);
 app.post("/auth/verify-token", verifyToken);
 app.post("/auth/login-user", userLogin);
-app.post("/auth/verify-email", verifyEmail);
-
 // 404 Not Found handler
 app.use((_req, res) => {
   res.status(404).json({ message: "Not Found" });

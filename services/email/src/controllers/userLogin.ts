@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { UserLoginSchema } from "../schema";
+ 
 import prisma from "../prisma";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { LoginAttemp } from "../generated/prisma";
+import { UserLoginSchema } from "../schema";
 
 
 type LoginHistory = {
