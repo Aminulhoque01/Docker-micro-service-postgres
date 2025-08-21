@@ -4,6 +4,7 @@ import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import { Pool } from "pg"; // Using Pool for connection pooling
 import { userLogin, userRegistration,  verifyEmail,  verifyToken } from "./controllers";
+import errorHandler from "./controllers/errorHandler";
  
  
 
@@ -21,7 +22,7 @@ app.get("/health", (_req, res) => {
 
 
 // routes 
- 
+ app.use(errorHandler);
 app.post("/auth/registration-user", userRegistration);
 app.post("/auth/verify-email", verifyEmail);
 app.post("/auth/verify-token", verifyToken);
