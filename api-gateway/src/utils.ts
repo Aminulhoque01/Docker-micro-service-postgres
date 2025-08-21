@@ -18,7 +18,10 @@ export const createHandler = (hostname: string, path: string, method: string) =>
             const { data } = await axios({
                 method,
                 url, // Use the modified url
-                data: req.body
+                data: req.body,
+                headers:{
+                    origin:'http://localhost:8085'
+                }
             });
             res.json(data);
         } catch (error) {
@@ -31,6 +34,7 @@ export const createHandler = (hostname: string, path: string, method: string) =>
         }
     };
 };
+
 export const getMiddlewares = (names: string[]) => {
     return names
         .map((name) => middlewares.find((m) => m.name === name))
