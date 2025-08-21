@@ -42,33 +42,49 @@ var morgan_1 = __importDefault(require("morgan"));
 var helmet_1 = __importDefault(require("helmet"));
 var express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 var utils_1 = require("./utils");
-// import rateLimit from 'expres-rate-limit'
 dotenv.config();
 var app = (0, express_1.default)();
 app.use((0, helmet_1.default)());
-// In the limiter handler
 var limiter = (0, express_rate_limit_1.default)({
     windowMs: 15 * 60 * 1000,
     max: 100,
     handler: function (req, res) {
         res.status(429).json({ message: "Too many requests, please try again later" });
-    }
+    },
 });
-app.use('/api', limiter);
-app.use((0, morgan_1.default)('dev'));
+app.use("/api", limiter);
+app.use((0, morgan_1.default)("dev"));
 app.use(express_1.default.json());
-//error handler
+// Register routes before the 404 handler
+(0, utils_1.configureRoutes)(app);
+// Health check
+app.get("/api/health", function (req, res) {
+    res.json({ message: "API Gateway is running" });
+});
+// 404 handler
+app.use((0, helmet_1.default)());
+app.use("/api", limiter);
+app.use((0, morgan_1.default)("dev"));
+app.use(express_1.default.json());
+// Register routes before the 404 handler
+(0, utils_1.configureRoutes)(app);
+// Health check
+app.get("/api/health", function (req, res) {
+    res.json({ message: "API Gateway is running" });
+});
+// 404 handler
+app.use(function (req, res, next) {
+    res.status(404).json({ message: "Not Found" });
+});
+// Error handler
 app.use(function (err, _req, res, _next) {
     console.error(err.stack);
     res.status(500).json({ message: "Internal server error" });
 });
 var PORT = process.env.PORT || 8081;
 app.listen(PORT, function () {
-    console.log("ApI Gateway is running on port ".concat(PORT));
+    console.log("API Gateway is running on port ".concat(PORT));
 });
-//routes
-(0, utils_1.configureRoutes)(app);
-//health check
-app.get("/api/health", function (req, res) {
-    res.json({ message: "API Gateway is runnig" });
+process.on('unhandledRejection', function (reason, promise) {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });

@@ -25,3 +25,7 @@ export const UserLoginSchema = z.object({
    password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
+export const AccessTokenSchema = z.object({
+   accessToken: z.string(),
+})
+

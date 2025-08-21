@@ -23,7 +23,7 @@ app.get("/health", (_req, res) => {
 // routes 
  
 app.post("/auth/registration-user", userRegistration);
-app.post("/auth/verifyEmail", verifyEmail);
+app.post("/auth/verify-email", verifyEmail);
 app.post("/auth/verify-token", verifyToken);
 app.post("/auth/login-user", userLogin);
 // 404 Not Found handler
