@@ -3,11 +3,10 @@ import prisma from "../prisma";
 import axios from "axios";
 import { INVENTORY_URL } from "../config";
 
-  
-
 const getProductDetails = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('Origin', req.headers.origin);
+    // Log the Origin header or display a message if it's undefined
+    console.log('Origin', req.headers.origin || 'No origin header');
 
     const { id } = req.params;  // Get the product ID from the URL
 
@@ -30,7 +29,7 @@ const getProductDetails = async (req: Request, res: Response, next: NextFunction
           sku: product.sku,
         }
       );
-      
+
       console.log(`Inventory created successfully`, inventory.id);
 
       // Update product with the new inventory id
@@ -51,18 +50,28 @@ const getProductDetails = async (req: Request, res: Response, next: NextFunction
     }
 
     // If product already has an inventory, fetch inventory details
-    const inventory = await axios.get(`${INVENTORY_URL}/inventories/${product.inventoryId}`);
+    console.log('Inventory ID:', product.inventoryId); // Check the inventoryId
+    try {
+      const inventory = await axios.get(`${INVENTORY_URL}/inventories/${product.inventoryId}`);
 
-    // Return the product details along with inventory details
-    return res.status(200).json({
-      ...product,
-      inventoryId: inventory.data.id,
-      stock: inventory.data.quantity || 0,
-      stockStatus: inventory.data.quantity > 0 ? "In stock" : "Out of stock",
-    });
+      // Return the product details along with inventory details
+      return res.status(200).json({
+        ...product,
+        inventoryId: inventory.data.id,
+        stock: inventory.data.quantity || 0,
+        stockStatus: inventory.data.quantity > 0 ? "In stock" : "Out of stock",
+      });
+    } catch (error) {
+      if (error) {
+        return res.status(404).json({ message: "Inventory not found" });
+      }
+      // Handle any other errors that may occur during inventory fetching
+      next(error);  // Pass the error to the next middleware
+    }
 
   } catch (error) {
-    next(error);  // Pass the error to the next middleware
+    // Pass the error to the next middleware if it occurs during any part of the process
+    next(error);
   }
 };
 

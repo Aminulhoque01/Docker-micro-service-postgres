@@ -25,7 +25,7 @@ export const createHandler = (hostname: string, path: string, method: string) =>
                     'x-user-email':req.headers['x-user-email']|| "",
                     'x-user-name':req.headers['x-user-name']||'',
                     'x-user-role':req.headers['x-user-role']||'',
-                    'user-agent': req.headers['user-agent']
+                    'user-agent': req.headers['user-agent'] || '',
                 }
             });
             res.json(data);
