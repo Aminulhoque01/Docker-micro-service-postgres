@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src", // Set to the relative path of your source files
+    "outDir": "./dist", 
+    "module": "commonjs",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "strict": true
+  },
+  "include": [
+    "./src/**/*"  // Include all files in src
+  ]
+}
