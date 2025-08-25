@@ -5,13 +5,29 @@
       "routes": [
         {
           "path": "/product",
-          "methods": ["get", "post"],
-          "middlewares": ["auth"]
+          "methods": [
+            "get",
+            "post"
+          ],
+          "middlewares": []
+        },
+        {
+          "path": "/product",
+          "methods": [
+            "post"
+          ],
+          "middlewares": [
+            "auth"
+          ]
         },
         {
           "path": "/product/:id",
-          "methods": ["get"],
-          "middlewares": ["auth"]
+          "methods": [
+            "get"
+          ],
+          "middlewares": [
+            "auth"
+          ]
         }
       ]
     },
@@ -20,13 +36,21 @@
       "routes": [
         {
           "path": "/inventories/:id",
-          "methods": ["put"],
-          "middlewares": ["auth"]
+          "methods": [
+            "put"
+          ],
+          "middlewares": [
+            "auth"
+          ]
         },
         {
           "path": "/inventories/:id/details",
-          "methods": ["get"],
-          "middlewares": ["auth"]
+          "methods": [
+            "get"
+          ],
+          "middlewares": [
+            "auth"
+          ]
         }
       ]
     },
@@ -35,22 +59,30 @@
       "routes": [
         {
           "path": "/auth/register",
-          "methods": ["post"],
+          "methods": [
+            "post"
+          ],
           "middlewares": []
         },
         {
           "path": "/auth/login",
-          "methods": ["post"],
+          "methods": [
+            "post"
+          ],
           "middlewares": []
         },
         {
           "path": "/auth/verify-email",
-          "methods": ["post"],
+          "methods": [
+            "post"
+          ],
           "middlewares": []
         },
         {
           "path": "/auth/verify-token",
-          "methods": ["post"],
+          "methods": [
+            "post"
+          ],
           "middlewares": []
         }
       ]
@@ -60,8 +92,12 @@
       "routes": [
         {
           "path": "/users/:id",
-          "methods": ["get"],
-          "middlewares": ["auth"]
+          "methods": [
+            "get"
+          ],
+          "middlewares": [
+            "auth"
+          ]
         }
       ]
     }
