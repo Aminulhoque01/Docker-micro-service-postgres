@@ -6,7 +6,7 @@ import { NextFunction, Request, Response } from "express";
 import { CartItemSchema } from "../schemas";
 import redis from "../redis";
 import { v4 as uuid } from "uuid";
-import { CART_TTL } from "../config";
+import { CART_TTL, INVERTORY_SERVICE } from "../config";
 
 const addToCart = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -37,6 +37,18 @@ const addToCart = async (req: Request, res: Response, next: NextFunction) => {
             res.setHeader("x-cart-session-id", cartSessionId);
         }
 
+        //check if the inventory is available
+        const { data } = await axios.get(`${INVERTORY_SERVICE}/inventories/${parseBody.data.inventoryId}`);
+        const inventoryData = data as { quantity: number }; // Type assertion
+        if (Number(inventoryData.quantity) < parseBody.data.quantity) {
+            return res.status(400).json({ message: "Inventory not available" });
+        }
+
+        // updated the inventiry
+        await axios.put(`${INVERTORY_SERVICE}/inventories/${parseBody.data.inventoryId}`, {
+            quantity: inventoryData.quantity - parseBody.data.quantity,
+        });
+
         // Add item to the cart (store as a hash)
         await redis.hset(
             `cart:${cartSessionId}`,
@@ -48,7 +60,7 @@ const addToCart = async (req: Request, res: Response, next: NextFunction) => {
         );
 
         // Set TTL for the cart (optional, if you want the cart to expire)
-        await redis.expire(`cart:${cartSessionId}`, CART_TTL);
+        await redis.expire(`cart:${cartSessionId}`, CART_TTL,);
 
         return res.status(200).json({ message: "Item added to cart", cartSessionId });
 
