@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+ 
 }
 
 datasource db {
@@ -27,7 +27,7 @@ enum OrderStatus {
 model Order {
   id          String      @id @default(cuid())
   userId       String
-  useName       String
+  userName       String
   userEmail     String
   subtotal    Float   @default(0)
   tax         Float   @default(0)

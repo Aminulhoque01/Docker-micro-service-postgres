@@ -41,13 +41,12 @@ const checkout = async (req: Request, res: Response, next: NextFunction) => {
                 const { data: product } = await axios.get(`${PRODUCT_SERVICE}/product/${item.productId}`);
                 return {
                     productId: product.id as string,
-                    name: product.name as string,
-                    price: product.price as number,
+                    productName: product.name as string,
+                    unitPrice: product.price as number,
                     quantity: item.quantity as number,
                     sku: product.sku as string,
                     inventoryId: item.inventoryId as string,
                     totalPrice: product.price * item.quantity
-
                 };
             })
         )
@@ -65,10 +64,10 @@ const checkout = async (req: Request, res: Response, next: NextFunction) => {
                 userId: parsedBody.data.userId,
                 userName: parsedBody.data.userName,
                 userEmail: parsedBody.data.userEmail,
-                cartSessionId: parsedBody.data.cartSessionId,
-                subTotal,
+                subtotal: subTotal,
                 tax,
                 grandTotal,
+                totalPrice: grandTotal,
                 orderItems: {
                     create: productDetails.map((item) => ({
                         ...item,
