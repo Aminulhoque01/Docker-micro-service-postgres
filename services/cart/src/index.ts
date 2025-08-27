@@ -2,7 +2,7 @@ import cors from "cors";
 import * as dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
-import { addToCart, getMyCart } from "./controller";
+import { addToCart, clearCart, getMyCart } from "./controller";
 import './events/onkeyExpires';
 
 dotenv.config();
@@ -20,6 +20,7 @@ app.get("/health", (_req, res) => {
 // Routes
 app.post('/cart', addToCart);
 app.get('/my-cart', getMyCart);
+app.get('/clear-cart', clearCart);
 
 // 404 Not Found handler
 app.use((_req, res) => {
