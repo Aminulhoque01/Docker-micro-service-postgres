@@ -14,6 +14,8 @@ redis.subscribe(CHENNEL_KEY);
 redis.on("message", async (channel, message) => {
     if (channel === CHENNEL_KEY) {
         console.log(`Key expired:`, message);
+        const carKey = message.split(':').pop();
+        if(!carKey) return;
         
     }
 });
