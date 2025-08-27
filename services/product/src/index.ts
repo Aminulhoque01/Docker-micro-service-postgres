@@ -3,7 +3,7 @@ import * as dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import { Pool } from "pg"; // Using Pool for connection pooling
-import { createProduct, getProductDetails, getProducts } from "./controllers";
+import { createProduct, getProductDetails, getProducts, updatedProduct } from "./controllers";
 
 
 dotenv.config();
@@ -19,6 +19,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.get("/product/:id", getProductDetails)
+app.patch("/product/:id", updatedProduct)
 app.get("/product/", getProducts) 
 app.post("/create_product", createProduct)
  

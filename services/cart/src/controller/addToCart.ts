@@ -7,6 +7,7 @@ import { CartItemSchema } from "../schemas";
 import redis from "../redis";
 import { v4 as uuid } from "uuid";
 import { CART_TTL, INVERTORY_SERVICE } from "../config";
+import axios from "axios";
 
 const addToCart = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -40,15 +41,14 @@ const addToCart = async (req: Request, res: Response, next: NextFunction) => {
         //check if the inventory is available
         const { data } = await axios.get(`${INVERTORY_SERVICE}/inventories/${parseBody.data.inventoryId}`);
         const inventoryData = data as { quantity: number }; // Type assertion
-        if (Number(inventoryData.quantity) < parseBody.data.quantity) {
+         
+        if (inventoryData.quantity < parseBody.data.quantity) {
             return res.status(400).json({ message: "Inventory not available" });
         }
-
-        // updated the inventiry
-        await axios.put(`${INVERTORY_SERVICE}/inventories/${parseBody.data.inventoryId}`, {
-            quantity: inventoryData.quantity - parseBody.data.quantity,
-        });
-
+        console.log("Inventory available:", inventoryData.quantity);
+        console.log("Requested quantity:", parseBody.data.quantity);
+       
+       
         // Add item to the cart (store as a hash)
         await redis.hset(
             `cart:${cartSessionId}`,
@@ -58,6 +58,13 @@ const addToCart = async (req: Request, res: Response, next: NextFunction) => {
                 quantity: parseBody.data.quantity,
             })
         );
+
+         // updated the inventiry
+        await axios.put(`${INVERTORY_SERVICE}/inventories/${parseBody.data.inventoryId}`, {
+            quantity: parseBody.data.quantity,
+            actionType: 'OUT'
+        });
+
 
         // Set TTL for the cart (optional, if you want the cart to expire)
         await redis.expire(`cart:${cartSessionId}`, CART_TTL,);

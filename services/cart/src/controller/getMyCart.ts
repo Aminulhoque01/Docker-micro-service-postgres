@@ -3,7 +3,7 @@ import redis from "../redis";
 
 
 
-const getMyCart = async(req: Request, res: Response, next:NextFunction) => {
+const getMyCart = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const cartSessionId = req.headers['x-cart-session-id'] as string || null;
 
@@ -19,9 +19,34 @@ const getMyCart = async(req: Request, res: Response, next:NextFunction) => {
 
         // return res.status(200).json({ cart });
 
-        const cart = await redis.hgetall(`cart:${cartSessionId}`);
+        //Check if the session id exists in the store
+        const sessionExists = await redis.exists(`session:${cartSessionId}`);
+        if (!sessionExists) {
+            await redis.del(`cart:${cartSessionId}`); // Delete the cart if session is invalid
+            return res.status(400).json({ data: [] });
+        }
 
-        return res.status(200).json({ message: "Cart fetched successfully", cart });
+        const items = await redis.hgetall(`cart:${cartSessionId}`);
+        if (Object.keys(items).length === 0) {
+            return res.status(200).json({ data: [] })
+        }
+
+        //format the cart items
+        const formattedItems = Object.keys(items).map((key) => {
+            const { inventoryId, quantity } = JSON.parse(items[key]) as { inventoryId: string; quantity: number };
+            return {
+                inventoryId,
+                quantity,
+                productId: key
+            }
+        });
+
+        return res.status(200).json({ data: formattedItems });
+
+
+
+
+
 
     } catch (error) {
         next(error);
