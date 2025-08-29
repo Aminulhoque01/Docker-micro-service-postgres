@@ -67,7 +67,7 @@ const addToCart = async (req: Request, res: Response, next: NextFunction) => {
 
 
         // Set TTL for the cart (optional, if you want the cart to expire)
-        await redis.expire(`cart:${cartSessionId}`, CART_TTL,);
+        await redis.expire(`cart:${cartSessionId}`, 900,);
 
         return res.status(200).json({ message: "Item added to cart", cartSessionId });
 
@@ -79,3 +79,5 @@ const addToCart = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export default addToCart;
+
+

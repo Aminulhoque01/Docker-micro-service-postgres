@@ -4,7 +4,7 @@ import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import { Pool } from "pg"; // Using Pool for connection pooling
 import { check } from "zod";
-import { checkout, getOrder, getOrderByeId } from "./controller";
+import {  checkout, getOrder, getOrderByeId,  } from "./controller";
  
 
 dotenv.config();
@@ -19,17 +19,17 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ status: "UP" });
 });
 
- 
+ //routes
+app.post('/orders/checkout', checkout);
+app.get('/orders', getOrder);
+app.get('/orders/:id', getOrderByeId);
+
  
 // 404 Not Found handler
 app.use((_req, res) => {
   res.status(404).json({ message: "Not Found" });
 });
 
-//routes
-app.post('/checkout', checkout);
-app.get('/orders', getOrder);
-app.get('/orders/:id', getOrderByeId);
 
 
 // Error handling middleware

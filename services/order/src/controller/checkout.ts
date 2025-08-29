@@ -1,64 +1,175 @@
-// validation user inputs
-// Get cart items using cartSessionId
-// If cart is empty return error 400
-// Create order in orders items
-// invoke email service
-// invoke cart service
+// // // validation user inputs
+// // // Get cart items using cartSessionId
+// // // If cart is empty return error 400
+// // // Create order in orders items
+// // // invoke email service
+// // // invoke cart service
+
+// import { NextFunction, Request, Response } from "express";
+// import { OrderSchema, CartItemSchema } from "../schema";
+// import axios from "axios";
+// import { CART_SERVICE, EMAIL_SERVICE, PRODUCT_SERVICE } from "../config";
+// import { z } from "zod";
+// import prisma from "../prisma";
+
+
+// const checkout = async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//         // validation request
+//         const parsedBody = OrderSchema.safeParse(req.body)
+//         console.log(parsedBody)
+//         if (!parsedBody.success) {
+//             return res.status(400).json({ message: "Invalid request", errors: parsedBody.error })
+//         }
+
+//         // get cart details
+//         const { data: cartData } = await axios.get(`${CART_SERVICE}/my-cart`, {
+//             headers: {
+//                 'x-cart-session-id': parsedBody.data.cartSessionId
+//             }
+//         });
+//         console.log('cart data', cartData.data)
+//         const cartItems = z.array(CartItemSchema).safeParse(cartData.data);
+//         console.log('asdasdfdssdfsffsdf', cartItems)
+//         if (!cartItems.success) {
+//             return res.status(500).json({ message: "Invalid cart items schema", errors: cartItems.error })
+//         }
+//         if (cartItems.data.length === 0) {
+//             return res.status(400).json({ message: "Cart is empty" })
+//         }
+
+//         // get product details for each cart items
+//         const productDetails = await Promise.all(
+//             cartItems.data.map(async (item) => {
+//                 const { data: product } = await axios.get(`${PRODUCT_SERVICE}/product/${item.productId}`);
+//                 return {
+//                     productId: product.id as string,
+//                     productName: product.name as string,
+//                     unitPrice: product.price as number,
+//                     quantity: item.quantity as number,
+//                     sku: product.sku as string,
+//                     inventoryId: item.inventoryId as string,
+//                     totalPrice: product.price * item.quantity
+//                 };
+//             })
+//         )
+
+//         const subTotal = productDetails.reduce((acc, item) => acc + item.totalPrice, 0);
+
+//         // TODO: will handle tax calculation later
+//         const tax = 0;
+//         const grandTotal = subTotal + tax;
+
+//         // create order 
+
+//         const order = await prisma.order.create({
+//             data: {
+//                 userId: parsedBody.data.userId,
+//                 userName: parsedBody.data.userName,
+//                 userEmail: parsedBody.data.userEmail,
+//                 subtotal: subTotal,
+//                 tax,
+//                 grandTotal,
+//                 totalPrice: grandTotal,
+//                 orderItems: {
+//                     create: productDetails.map((item) => ({
+//                         productId: item.productId,
+//                         productName: item.productName,
+//                         unitPrice: item.unitPrice,
+//                         quantity: item.quantity,
+//                         sku: item.sku,
+//                         totalPrice: item.totalPrice,
+//                         // Remove inventoryId from here
+//                     })),
+//                 },
+//             },
+//         });
+
+//         //clear cart
+//         await axios.get(`${CART_SERVICE}/clear-cart`, {
+//             headers: {
+//                 'x-cart-session-id': parsedBody.data.cartSessionId
+//             }
+//         });
+
+//         // send order confirmation email
+//         await axios.post(`${EMAIL_SERVICE}/emails/send-email`, {
+//             recipient: parsedBody.data.userEmail,
+//             subject: "Order Confirmation",
+//             body: `Your order with id ${order.id} has been placed successfully.`,
+//             source: "Checkout"
+//         });
+
+//         return res.status(201).json({ message: "Order created successfully", order })
+//     } catch (error) {
+//         next(error)
+
+//     }
+// }
+
+// export default checkout;
+
 
 import { NextFunction, Request, Response } from "express";
 import { OrderSchema, CartItemSchema } from "../schema";
 import axios from "axios";
 import { CART_SERVICE, EMAIL_SERVICE, PRODUCT_SERVICE } from "../config";
-import z from "zod";
+import { z } from "zod";
 import prisma from "../prisma";
-
 
 const checkout = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        // validation request
-        const parsedBody = OrderSchema.safeParse(req.body)
+        // Validate request
+        const parsedBody = OrderSchema.safeParse(req.body);
         if (!parsedBody.success) {
-            return res.status(400).json({ message: "Invalid request", errors: parsedBody.error })
+            return res.status(400).json({ message: "Invalid request", errors: parsedBody.error });
         }
 
-        // get cart details
-        const { data: cartData } = await axios.get(`${CART_SERVICE}/cart/me`, {
+        // Get cart details
+        const { data: cartData } = await axios.get(`${CART_SERVICE}/my-cart`, {
             headers: {
-                'x-cart-session-id': parsedBody.data.cartSessionId
-            }
+                "x-cart-session-id": parsedBody.data.cartSessionId,
+            },
         });
-        const cartItems = z.array(CartItemSchema).safeParse(cartData.items);
+        if (!cartData.data || !Array.isArray(cartData.data)) {
+            return res.status(500).json({ message: "Invalid cart data from CART_SERVICE" });
+        }
+
+        const cartItems = z.array(CartItemSchema).safeParse(cartData.data);
         if (!cartItems.success) {
-            return res.status(500).json({ message: "Invalid cart items schema", errors: cartItems.error })
+            return res.status(500).json({ message: "Invalid cart items schema", errors: cartItems.error });
         }
         if (cartItems.data.length === 0) {
-            return res.status(400).json({ message: "Cart is empty" })
+            return res.status(400).json({ message: "Cart is empty" });
         }
 
-        // get product details for each cart items
+        // Get product details for each cart item
         const productDetails = await Promise.all(
             cartItems.data.map(async (item) => {
-                const { data: product } = await axios.get(`${PRODUCT_SERVICE}/product/${item.productId}`);
-                return {
-                    productId: product.id as string,
-                    productName: product.name as string,
-                    unitPrice: product.price as number,
-                    quantity: item.quantity as number,
-                    sku: product.sku as string,
-                    inventoryId: item.inventoryId as string,
-                    totalPrice: product.price * item.quantity
-                };
+                try {
+                    const { data: product } = await axios.get(`${PRODUCT_SERVICE}/product/${item.productId}`);
+                    if (!product || !product.id || !product.name || !product.price || !product.sku) {
+                        throw new Error(`Invalid product data for productId: ${item.productId}`);
+                    }
+                    return {
+                        productId: product.id as string,
+                        productName: product.name as string,
+                        unitPrice: product.price as number,
+                        quantity: item.quantity as number,
+                        sku: product.sku as string,
+                        totalPrice: product.price * item.quantity,
+                    };
+                } catch (error) {
+                    throw new Error(`Failed to fetch product ${item.productId}: ${error}`);
+                }
             })
-        )
+        );
 
         const subTotal = productDetails.reduce((acc, item) => acc + item.totalPrice, 0);
-
-        // TODO: will handle tax calculation later
         const tax = 0;
         const grandTotal = subTotal + tax;
 
-        // create order 
-
+        // Create order
         const order = await prisma.order.create({
             data: {
                 userId: parsedBody.data.userId,
@@ -70,33 +181,51 @@ const checkout = async (req: Request, res: Response, next: NextFunction) => {
                 totalPrice: grandTotal,
                 orderItems: {
                     create: productDetails.map((item) => ({
-                        ...item,
-                    }))
+                        productId: item.productId,
+                        productName: item.productName,
+                        unitPrice: item.unitPrice,
+                        quantity: item.quantity,
+                        sku: item.sku,
+                        totalPrice: item.totalPrice,
+                    })),
                 },
-
             },
         });
 
-        //clear cart
-        await axios.get(`${CART_SERVICE}/cart/clear`, {
+        // Clear cart
+        await axios.get(`${CART_SERVICE}/clear-cart`, {
             headers: {
-                'x-cart-session-id': parsedBody.data.cartSessionId
-            }
+                "x-cart-session-id": parsedBody.data.cartSessionId,
+            },
         });
 
-        // send order confirmation email
-        await axios.post(`${EMAIL_SERVICE}/emails/send`,{
-            recipient: parsedBody.data.userEmail,
-            subject: "Order Confirmation",
-            body: `Your order with id ${order.id} has been placed successfully.`,
-            source: "Checkout"
-        });
+        // Send order confirmation email (non-blocking)
+        try {
+            const emailPayload = {
+                recipient: parsedBody.data.userEmail,
+                subject: "Order Confirmation",
+                body: `Your order with id ${order.id} has been placed successfully.`,
+                source: "Checkout",
+            };
+            console.log("Email Payload:", emailPayload);
+            await axios.post(`${EMAIL_SERVICE}/emails/send-email`, emailPayload);
+            console.log("Email sent successfully");
+        } catch (emailError) {
+            console.error("Failed to send email:", emailError);
+            // Log the error but don't fail the request
+        }
 
-        return res.status(201).json({ message: "Order created successfully", order })
+        return res.status(201).json({ message: "Order created successfully", order });
     } catch (error) {
-        next(error)
-
+        if (axios.isAxiosError(error)) {
+            return res.status(500).json({
+                message: `Failed to process request to ${error.config?.url}`,
+                status: error.response?.status,
+                details: error.response?.data,
+            });
+        }
+        return res.status(500).json({ message: "Internal server error", error: error });
     }
-}
+};
 
 export default checkout;
