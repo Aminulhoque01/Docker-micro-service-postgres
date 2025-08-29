@@ -204,7 +204,7 @@ const checkout = async (req: Request, res: Response, next: NextFunction) => {
             const emailPayload = {
                 recipient: parsedBody.data.userEmail,
                 subject: "Order Confirmation",
-                body: `Your order with id ${order.id} has been placed successfully.`,
+                body: `Thank you for your order.Your order with id ${order.id} has been placed successfully.`,
                 source: "Checkout",
             };
             console.log("Email Payload:", emailPayload);
