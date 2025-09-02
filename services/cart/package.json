@@ -7,6 +7,7 @@
     "@prisma/client": "^6.13.0",
     "@types/bcryptjs": "^3.0.0",
     "@types/ioredis": "^4.28.10",
+    "amqplib": "^0.10.9",
     "axios": "^1.11.0",
     "axios-retry": "^4.5.0",
     "bcrypt": "^6.0.0",
@@ -33,6 +34,7 @@
     "build": "tsc && tsc-alias"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.10.7",
     "@types/axios": "^0.9.36",
     "@types/cors": "^2.8.19",
     "@types/dotenv": "^8.2.3",
