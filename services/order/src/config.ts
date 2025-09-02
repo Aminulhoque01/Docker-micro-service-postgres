@@ -7,3 +7,6 @@
     export const EMAIL_SERVICE=process.env.EMAIL_SERVICE_URL||"http://localhost:4005";
     export const PRODUCT_SERVICE=process.env.PRODUCT_SERVICE_URL||"http://localhost:4002";
     export const INVENTORY_SERVICE=process.env.INVENTORY_SERVICE_URL||"http://localhost:4001";
+
+    export const Queue_url=process.env.QUEUE_URL||"amqp://localhost:5672";
+    export const QUEUE_NAME=process.env.QUEUE_NAME||"ORDER_QUEUE";

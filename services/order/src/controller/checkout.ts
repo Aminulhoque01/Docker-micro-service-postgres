@@ -6,6 +6,7 @@ import axios from "axios";
 import { CART_SERVICE, EMAIL_SERVICE, PRODUCT_SERVICE } from "../config";
 import { z } from "zod";
 import prisma from "../prisma";
+import sendToQueue from "../queue";
 
 const checkout = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -105,7 +106,12 @@ const checkout = async (req: Request, res: Response, next: NextFunction) => {
             // Log the error but don't fail the request
         }
 
+        // send queue message (non-blocking)
+        sendToQueue('sendEmail', JSON.stringify(order));
+        sendToQueue('clear-cart', JSON.stringify({ cartSessionId: parsedBody.data.cartSessionId }));
+
         return res.status(201).json({ message: "Order created successfully", order });
+
     } catch (error) {
         if (axios.isAxiosError(error)) {
             return res.status(500).json({
