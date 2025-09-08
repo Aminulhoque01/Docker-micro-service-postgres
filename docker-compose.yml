@@ -72,3 +72,4 @@ volumes:
   mailhog:
   redis-stck:
   rabbitmq-data:
+  kong_data:
