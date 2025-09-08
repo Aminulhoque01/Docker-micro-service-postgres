@@ -2,8 +2,8 @@ import cors from "cors";
 import * as dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
-import { Pool } from "pg"; // Using Pool for connection pooling
-import { check } from "zod";
+import { Pool } from "pg"; 
+
 import {  checkout, getOrder, getOrderByeId,  } from "./controller";
  
 
@@ -19,7 +19,7 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ status: "UP" });
 });
 
- //routes
+//routes
 app.post('/orders/checkout', checkout);
 app.get('/orders', getOrder);
 app.get('/orders/:id', getOrderByeId);

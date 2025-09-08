@@ -5,7 +5,7 @@ import morgan from "morgan";
 import { Pool } from "pg"; // Using Pool for connection pooling
 import sentEmail from "./controllers/sentEmail";
 import { getEmails } from "./controllers";
- 
+import './receiver'
 
 dotenv.config();
 

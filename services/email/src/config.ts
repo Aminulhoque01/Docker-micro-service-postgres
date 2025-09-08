@@ -29,4 +29,4 @@ export const transporter = nodemailer.createTransport({
     } : undefined
 });
 
-export const defaultSender = process.env.DEFAULT_SENDER_EMAIL || "admin@example.com";
+export const defaultSender = process.env.DEFAULT_SENDER_EMAIL || "Aminulhaque@gmail.com";

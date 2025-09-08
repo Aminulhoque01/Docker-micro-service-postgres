@@ -83,31 +83,33 @@ const checkout = async (req: Request, res: Response, next: NextFunction) => {
             },
         });
 
+        console.log(`order created`, order)
+
         // Clear cart
-        await axios.get(`${CART_SERVICE}/clear-cart`, {
-            headers: {
-                "x-cart-session-id": parsedBody.data.cartSessionId,
-            },
-        });
+        // await axios.get(`${CART_SERVICE}/clear-cart`, {
+        //     headers: {
+        //         "x-cart-session-id": parsedBody.data.cartSessionId,
+        //     },
+        // });
 
         // Send order confirmation email (non-blocking)
-        try {
-            const emailPayload = {
-                recipient: parsedBody.data.userEmail,
-                subject: "Order Confirmation",
-                body: `Thank you for your order.Your order with id ${order.id} has been placed successfully.`,
-                source: "Checkout",
-            };
-            console.log("Email Payload:", emailPayload);
-            await axios.post(`${EMAIL_SERVICE}/emails/send-email`, emailPayload);
-            console.log("Email sent successfully");
-        } catch (emailError) {
-            console.error("Failed to send email:", emailError);
-            // Log the error but don't fail the request
-        }
+        // try {
+        //     const emailPayload = {
+        //         recipient: parsedBody.data.userEmail,
+        //         subject: "Order Confirmation",
+        //         body: `Thank you for your order.Your order with id ${order.id} has been placed successfully.`,
+        //         source: "Checkout",
+        //     };
+        //     console.log("Email Payload:", emailPayload);
+        //     await axios.post(`${EMAIL_SERVICE}/emails/send-email`, emailPayload);
+        //     console.log("Email sent successfully");
+        // } catch (emailError) {
+        //     console.error("Failed to send email:", emailError);
+        //     // Log the error but don't fail the request
+        // }
 
         // send queue message (non-blocking)
-        sendToQueue('sendEmail', JSON.stringify(order));
+        sendToQueue('/emails/send-email', JSON.stringify(order));
         sendToQueue('clear-cart', JSON.stringify({ cartSessionId: parsedBody.data.cartSessionId }));
 
         return res.status(201).json({ message: "Order created successfully", order });

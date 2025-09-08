@@ -1,4 +1,5 @@
 import amqp from 'amqplib';
+import redis from './redis';
 
 const receiverFromQueue = async (queue: string, callback: (message: string) => void) => {
 
@@ -15,5 +16,18 @@ const receiverFromQueue = async (queue: string, callback: (message: string) => v
         if (msg) {
             callback(msg.content.toString());
         }
+    },{
+        noAck:true
     });
 }
+
+receiverFromQueue('clear-cart',(msg)=>{
+    console.log(`Recived clear-cart: ${msg}`)
+    const parsedMessage = JSON.parse(msg);
+
+    const cartSessionId = parsedMessage.cartSessionId;
+    redis.del(`session:${cartSessionId}`);
+    redis.del(`Cart:${cartSessionId}`);
+
+    console.log(`cart clear`)
+})

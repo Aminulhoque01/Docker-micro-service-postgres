@@ -6,6 +6,7 @@
   "dependencies": {
     "@prisma/client": "^6.13.0",
     "@types/bcryptjs": "^3.0.0",
+    "amqplib": "^0.10.9",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
@@ -28,6 +29,7 @@
     "build": "tsc && tsc-alias"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.10.7",
     "@types/cors": "^2.8.19",
     "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.3",
